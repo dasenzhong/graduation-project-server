@@ -10,12 +10,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cloudage.membercenter.entity.User;
 import com.dgut.reallygoodapp.entity.CompanyUser;
 import com.dgut.reallygoodapp.entity.StudentUser;
 import com.dgut.reallygoodapp.service.ICompanyUserService;
 import com.dgut.reallygoodapp.service.IStudentUserService;
-import com.dgut.reallygoodapp.util.UserEntity;
 
 @RestController
 @RequestMapping("/api")
