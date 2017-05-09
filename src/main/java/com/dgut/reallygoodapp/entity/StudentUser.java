@@ -1,7 +1,10 @@
 package com.dgut.reallygoodapp.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToOne;
+
 
 import com.dgut.reallygoodapp.util.UserEntity;
 
@@ -14,6 +17,16 @@ public class StudentUser extends UserEntity{
 	String school;			//学校
 	String log;				//个性签名
 	String avatar;			//头像
+	
+	Resume Resume;			//简历
+	
+	@OneToOne(optional=false,cascade=CascadeType.ALL,mappedBy="studentUser")
+	public Resume getResume() {
+		return Resume;
+	}
+	public void setResume(Resume resume) {
+		Resume = resume;
+	}
 	
 	@Column(nullable=false,updatable=false)
 	public String getSex() {
