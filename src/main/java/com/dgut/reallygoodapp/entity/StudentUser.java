@@ -3,9 +3,7 @@ package com.dgut.reallygoodapp.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
-import com.dgut.reallygoodapp.util.BaseEntity;
 import com.dgut.reallygoodapp.util.UserEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class StudentUser extends UserEntity{
