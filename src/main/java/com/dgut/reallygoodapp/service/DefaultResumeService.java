@@ -30,7 +30,7 @@ public class DefaultResumeService implements IResumeService {
 	}
 
 	@Override
-	public List<Resume> findByStudentUser(StudentUser studentUser) {
+	public Resume findByStudentUser(StudentUser studentUser) {
 		return resumeRepo.findResumeByStudentUser(studentUser);
 	}
 

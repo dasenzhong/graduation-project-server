@@ -12,7 +12,7 @@ import com.dgut.reallygoodapp.entity.Resume;
 @Repository
 public interface IExperienceRepository extends PagingAndSortingRepository<Experience, Integer> {
 
-	@Query("from Experience e where e.resume = ?1")
+	@Query("from Experience e where e.resume = ?1 order by e.createDate DESC")
 	List<Experience> findExperienceByResume(Resume resume);
 	
 }

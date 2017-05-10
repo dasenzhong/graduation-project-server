@@ -4,10 +4,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
-import com.dgut.reallygoodapp.util.BaseEntity;
+import com.dgut.reallygoodapp.util.DateEntity;
 
 @Entity
-public class Job extends BaseEntity {
+public class Job extends DateEntity {
 
 	CompanyUser companyUser;	//工作所属
 	

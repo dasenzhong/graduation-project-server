@@ -12,6 +12,6 @@ import com.dgut.reallygoodapp.entity.Resume;
 @Repository
 public interface IHonorRepository extends PagingAndSortingRepository<Honor, Integer> {
 
-	@Query("from Honor h where h.resume = ?1")
+	@Query("from Honor h where h.resume = ?1 order by h.createDate DESC")
 	List<Honor> findHonorByResume(Resume resume);
 }

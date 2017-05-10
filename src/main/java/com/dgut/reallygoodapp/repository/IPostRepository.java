@@ -12,7 +12,7 @@ import com.dgut.reallygoodapp.entity.Resume;
 @Repository
 public interface IPostRepository extends PagingAndSortingRepository<Post, Integer> {
 
-	@Query("from Post p where p.resume = ?1")
+	@Query("from Post p where p.resume = ?1 order by p.createDate DESC")
 	List<Post> findPostByResume(Resume resume);
 	
 	

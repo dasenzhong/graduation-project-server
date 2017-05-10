@@ -11,5 +11,5 @@ public interface IResumeService {
 	
 	Resume findById(Integer id);
 	
-	List<Resume> findByStudentUser(StudentUser studentUser);
+	Resume findByStudentUser(StudentUser studentUser);
 }

@@ -4,10 +4,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
-import com.dgut.reallygoodapp.util.BaseEntity;
+import com.dgut.reallygoodapp.util.DateEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class Honor extends BaseEntity {
+public class Honor extends DateEntity {
 
 	Resume resume;			//荣誉所属
 	
@@ -17,6 +18,7 @@ public class Honor extends BaseEntity {
 	
 	
 	@ManyToOne(optional=false)
+	@JsonIgnore
 	public Resume getResume() {
 		return resume;
 	}
