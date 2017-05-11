@@ -14,7 +14,34 @@ public class CompanyUser extends UserEntity{
 	String companyName;
 	String log;
 	String avatar;
+	String companyType;
+	String companyNumber;
+	String companyIndustry;
 	
+	
+	@Column(nullable=false)
+	public String getCompanyType() {
+		return companyType;
+	}
+	public void setCompanyType(String companyType) {
+		this.companyType = companyType;
+	}
+	
+	@Column(nullable=false)
+	public String getCompanyNumber() {
+		return companyNumber;
+	}
+	public void setCompanyNumber(String companyNumber) {
+		this.companyNumber = companyNumber;
+	}
+	
+	@Column(nullable=false)
+	public String getCompanyIndustry() {
+		return companyIndustry;
+	}
+	public void setCompanyIndustry(String companyIndustry) {
+		this.companyIndustry = companyIndustry;
+	}
 	@Column(nullable=false)
 	public String getProvince() {
 		return province;

@@ -1,5 +1,7 @@
 package com.dgut.reallygoodapp.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -91,9 +93,17 @@ public class APIController {
 	// 公司注册
 	@RequestMapping(value = "/registercompany", method = RequestMethod.POST)
 	@ResponseBody
-	public CompanyUser registerCompany(@RequestParam String account, @RequestParam String password,
-			@RequestParam String province, @RequestParam String city, @RequestParam String town,
-			@RequestParam String companyName, HttpServletRequest request) {
+	public CompanyUser registerCompany(
+			@RequestParam String account,
+			@RequestParam String password,
+			@RequestParam String province,
+			@RequestParam String city,
+			@RequestParam String town,
+			@RequestParam String companyName,
+			@RequestParam String comapnyType,
+			@RequestParam String companyNumber,
+			@RequestParam String companyIndustry,
+			HttpServletRequest request) {
 
 		CompanyUser companyUser = new CompanyUser();
 		companyUser.setAccount(account);
@@ -351,5 +361,44 @@ public class APIController {
 		return JobService.getByCreateDatePage(page);
 	}
 	
+	//获取工作经验
+	@RequestMapping(value="/getexperience",method=RequestMethod.GET)
+	@ResponseBody
+	public List<Experience> getExperience(HttpServletRequest request){
+		
+		Resume resume = ResumeService.findByStudentUser(checkLoginStudent(request));
+		
+		return ExperienceService.findByResume(resume);
+	}
 	
+	//获取校内荣誉
+	@RequestMapping(value = "/gethonor", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Honor> getHonor(HttpServletRequest request) {
+
+		Resume resume = ResumeService.findByStudentUser(checkLoginStudent(request));
+
+		return HonorService.findByResume(resume);
+	}
+		
+	//获取校内职务
+	@RequestMapping(value = "/getpost", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Post> getPost(HttpServletRequest request) {
+
+		Resume resume = ResumeService.findByStudentUser(checkLoginStudent(request));
+
+		return PostService.findByResume(resume);
+	}
+	
+	//获取工作信息
+	@RequestMapping(value = "/getjob/{jobid}",method=RequestMethod.GET)
+	@ResponseBody
+	public Job getJob(
+			@PathVariable Integer id,
+			HttpServletRequest request){
+		
+		return JobService.findById(id);
+		
+	}
 }

@@ -90,7 +90,7 @@ public class Job extends DateEntity {
 		this.employProvince = employProvince;
 	}
 	
-	@Column(nullable=false,updatable=false)
+	@Column(nullable=true,updatable=false)
 	public String getEmployCity() {
 		return employCity;
 	}
@@ -98,7 +98,7 @@ public class Job extends DateEntity {
 		this.employCity = employCity;
 	}
 	
-	@Column(nullable=false,updatable=false)
+	@Column(nullable=true,updatable=false)
 	public String getEmployTown() {
 		return employTown;
 	}
@@ -114,7 +114,7 @@ public class Job extends DateEntity {
 		this.workProvince = workProvince;
 	}
 	
-	@Column(nullable=false,updatable=false)
+	@Column(nullable=true,updatable=false)
 	public String getWorkCity() {
 		return workCity;
 	}
@@ -122,7 +122,7 @@ public class Job extends DateEntity {
 		this.workCity = workCity;
 	}
 	
-	@Column(nullable=false,updatable=false)
+	@Column(nullable=true,updatable=false)
 	public String getWorkTown() {
 		return workTown;
 	}
