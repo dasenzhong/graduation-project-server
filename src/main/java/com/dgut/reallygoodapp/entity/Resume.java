@@ -13,13 +13,23 @@ public class Resume extends BaseEntity {
 
 	String name;				//简历名字
 	String birthday;			//出生年月
-	String tlelephone;			//电话
+	String telephone;			//电话
 	String liveProvince;		//省份
 	String liveCity;			//城市
 	String liveTown;			//城镇
 	String school;				//学校
+	boolean isPrefect;			//是否完善
 	
 	StudentUser studentUser;
+
+	@Column(nullable=false)
+	public boolean isPrefect() {
+		return isPrefect;
+	}
+
+	public void setPrefect(boolean isPrefect) {
+		this.isPrefect = isPrefect;
+	}
 
 	@Column(nullable=true)
 	public String getName() {
@@ -40,12 +50,12 @@ public class Resume extends BaseEntity {
 	}
 
 	@Column(nullable=true)
-	public String getTlelephone() {
-		return tlelephone;
+	public String getTelephone() {
+		return telephone;
 	}
 
-	public void setTlelephone(String tlelephone) {
-		this.tlelephone = tlelephone;
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
 	}
 
 	@Column(nullable=true)

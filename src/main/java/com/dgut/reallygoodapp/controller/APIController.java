@@ -83,6 +83,7 @@ public class APIController {
 		
 		Resume resume = new Resume();
 		resume.setStudentUser(studentUser);
+		resume.setPrefect(false);
 		
 		studentUser.setResume(ResumeService.save(resume));
 
@@ -352,6 +353,48 @@ public class APIController {
 		}
 		
 		return TalkService.save(talk);
+	}
+	
+	//保存简历基本信息
+	@RequestMapping(value="/saveresume",method = RequestMethod.POST)
+	@ResponseBody
+	public Resume saveResume(
+			@RequestParam String name,
+			@RequestParam String birthday,
+			@RequestParam String telephone,
+			@RequestParam String liveProvince,
+			@RequestParam String liveCity,
+			@RequestParam String liveTown,
+			@RequestParam String school,
+			HttpServletRequest request){
+		
+		Resume resume = ResumeService.findByStudentUser(checkLoginStudent(request));
+
+		if (resume == null) {
+			return null;
+		} else {
+			resume.setName(name);
+			resume.setBirthday(birthday);
+			resume.setTelephone(telephone);
+			resume.setLiveProvince(liveProvince);
+			resume.setLiveCity(liveCity);
+			resume.setLiveTown(liveTown);
+			resume.setSchool(school);
+			
+			if (name!=null && birthday !=null && telephone!=null 
+					&& liveProvince!=null && school!=null & !name.isEmpty()
+					&& !birthday.isEmpty() && !telephone.isEmpty() && !liveProvince.isEmpty()
+					&& !school.isEmpty()) {
+				
+				resume.setPrefect(true);
+			}else {
+				resume.setPrefect(false);
+			}
+			
+			return ResumeService.save(resume);
+		}
+		
+		
 	}
 	
 	//获取最新的兼职信息
