@@ -19,6 +19,8 @@ import com.dgut.reallygoodapp.entity.CompanyUser;
 import com.dgut.reallygoodapp.entity.Experience;
 import com.dgut.reallygoodapp.entity.Honor;
 import com.dgut.reallygoodapp.entity.Job;
+import com.dgut.reallygoodapp.entity.NewsCompany;
+import com.dgut.reallygoodapp.entity.NewsStudent;
 import com.dgut.reallygoodapp.entity.Post;
 import com.dgut.reallygoodapp.entity.Resume;
 import com.dgut.reallygoodapp.entity.StudentUser;
@@ -28,6 +30,8 @@ import com.dgut.reallygoodapp.service.ICompanyUserService;
 import com.dgut.reallygoodapp.service.IExperienceService;
 import com.dgut.reallygoodapp.service.IHonorService;
 import com.dgut.reallygoodapp.service.IJobService;
+import com.dgut.reallygoodapp.service.INewsCompanyService;
+import com.dgut.reallygoodapp.service.INewsStudentService;
 import com.dgut.reallygoodapp.service.IPostService;
 import com.dgut.reallygoodapp.service.IResumeService;
 import com.dgut.reallygoodapp.service.IStudentUserService;
@@ -63,6 +67,12 @@ public class APIController {
 	
 	@Autowired
 	IResumeService ResumeService;
+	
+	@Autowired
+	INewsCompanyService NewsCompanyService;
+	
+	@Autowired
+	INewsStudentService NewsStudentService;
 
 	@RequestMapping(value = "/hello", method = RequestMethod.GET)
 	public @ResponseBody String hello() {
@@ -306,51 +316,89 @@ public class APIController {
 	}
 	
 	//添加文章
-	@RequestMapping(value = "/addarticle",method=RequestMethod.POST)
+	@RequestMapping(value = "/addarticlestudent",method=RequestMethod.POST)
 	@ResponseBody
-	public Article addArticle(
+	public Article addArticleStudent(
+			@RequestParam String title,
 			@RequestParam String articleString,
 			HttpServletRequest request){
 		
-		CompanyUser companyUser = checkLoginCompany(request);
 		StudentUser studentUser = checkLoginStudent(request);
 		
 		Article article = new Article();
 		article.setArticle(articleString);
+		article.setTitle(title);
+
+		article.setUserId(studentUser.getId());
+		article.setUserAccount(studentUser.getAccount());
 		
-		if (companyUser!=null) {
-			article.setUserId(companyUser.getId());
-			article.setUserAccount(companyUser.getAccount());
-		}
-		if (studentUser != null) {
-			article.setUserId(studentUser.getId());
-			article.setUserAccount(studentUser.getAccount());
-		}
+		article.setStudent(true);
+		article.setCompany(false);
+		
+		return ArticleService.save(article);
+	}
+	
+	@RequestMapping(value = "/addarticlecompany",method=RequestMethod.POST)
+	@ResponseBody
+	public Article addArticleCompany(
+			@RequestParam String title,
+			@RequestParam String articleString,
+			HttpServletRequest request){
+		
+		CompanyUser companyUser = checkLoginCompany(request);
+		
+		Article article = new Article();
+		article.setArticle(articleString);
+		article.setTitle(title);
+
+		article.setUserId(companyUser.getId());
+		article.setUserAccount(companyUser.getAccount());
+		
+		article.setStudent(false);
+		article.setCompany(true);
 		
 		return ArticleService.save(article);
 	}
 	
 	//添加随想
-	@RequestMapping(value = "/addtalk",method=RequestMethod.POST)
+	@RequestMapping(value = "/addtalkstudent",method=RequestMethod.POST)
 	@ResponseBody
-	public Talk addTalk(
+	public Talk addTalkStudent(
 			@RequestParam String talkString,
 			HttpServletRequest request){
 		
-		CompanyUser companyUser = checkLoginCompany(request);
 		StudentUser studentUser = checkLoginStudent(request);
 		
 		Talk talk = new Talk();
 		talk.setTalk(talkString);
+
+		talk.setUserId(studentUser.getId());
+		talk.setUserAccount(studentUser.getAccount());
 		
-		if (companyUser!=null) {
-			talk.setUserId(companyUser.getId());
-			talk.setUserAccount(companyUser.getAccount());
-		}
-		if (studentUser != null) {
-			talk.setUserId(studentUser.getId());
-			talk.setUserAccount(studentUser.getAccount());
-		}
+		talk.setStudent(true);
+		talk.setCompany(false);
+		
+		
+		return TalkService.save(talk);
+	}
+	
+	@RequestMapping(value = "/addtalkcompany",method=RequestMethod.POST)
+	@ResponseBody
+	public Talk addTalkCompany(
+			@RequestParam String talkString,
+			HttpServletRequest request){
+		
+		CompanyUser companyUser = checkLoginCompany(request);
+		
+		Talk talk = new Talk();
+		talk.setTalk(talkString);
+
+		talk.setUserId(companyUser.getId());
+		talk.setUserAccount(companyUser.getAccount());
+		
+		talk.setStudent(false);
+		talk.setCompany(true);
+		
 		
 		return TalkService.save(talk);
 	}
@@ -434,14 +482,53 @@ public class APIController {
 		return PostService.findByResume(resume);
 	}
 	
+	//获取个人基本信息
+	@RequestMapping(value="/getinfo",method=RequestMethod.POST)
+	@ResponseBody
+	public Resume getInfo(HttpServletRequest request){
+		
+		return ResumeService.findByStudentUser(checkLoginStudent(request));
+		
+	}
+	
 	//获取工作信息
 	@RequestMapping(value = "/getjob/{jobid}",method=RequestMethod.GET)
 	@ResponseBody
 	public Job getJob(
-			@PathVariable Integer id,
+			@PathVariable Integer jobid,
 			HttpServletRequest request){
 		
-		return JobService.findById(id);
+		return JobService.findById(jobid);
+		
+	}
+	
+	//申请工作
+	@RequestMapping(value = "/applyjob",method=RequestMethod.POST)
+	@ResponseBody
+	public NewsCompany applyJob(
+			@RequestParam Integer companyUserId,
+			@RequestParam Integer jobId,
+			HttpServletRequest request){
+		
+		CompanyUser companyUser = CompanyUserService.findById(companyUserId);
+		
+		Job job = JobService.findById(jobId);
+		
+		Resume resume = ResumeService.findByStudentUser(checkLoginStudent(request));
+		
+		String newsText = "有人对你发布的——" + job.getJobName() +"——进行了投递简历";
+		
+		NewsCompany newsCompany = new NewsCompany();
+		
+		newsCompany.setCompanyUser(companyUser);
+		newsCompany.setJob(job);
+		newsCompany.setResume(resume);
+		newsCompany.setNewsText(newsText);
+		newsCompany.setRead(false);
+		newsCompany.setAgent(false);
+		newsCompany.setJob(true);
+		
+		return NewsCompanyService.save(newsCompany);
 		
 	}
 }
