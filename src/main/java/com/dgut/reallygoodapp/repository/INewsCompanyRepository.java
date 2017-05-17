@@ -12,7 +12,7 @@ import com.dgut.reallygoodapp.entity.NewsCompany;
 @Repository
 public interface INewsCompanyRepository extends PagingAndSortingRepository<NewsCompany, Integer> {
 
-	@Query("from NewsCompany n where n.companyUser = ?1")
+	@Query("from NewsCompany n where n.companyUser = ?1 order by n.editDate DESC")
 	List<NewsCompany> findNewsByCompanyUser(CompanyUser companyUser);
 	
 }

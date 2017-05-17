@@ -16,8 +16,52 @@ public class NewsStudent extends DateEntity {
 	Job job;
 	
 	boolean isRead;
-	boolean isAgent;
-	boolean isJob;
+	Integer deal;
+	boolean isPass;
+	String meetTime;
+	String meetAddress;
+	String telephone;
+	
+	
+	@Column(nullable=true)
+	public String getMeetTime() {
+		return meetTime;
+	}
+	public void setMeetTime(String meetTime) {
+		this.meetTime = meetTime;
+	}
+	
+	@Column(nullable=true)
+	public String getMeetAddress() {
+		return meetAddress;
+	}
+	public void setMeetAddress(String meetAddress) {
+		this.meetAddress = meetAddress;
+	}
+	
+	@Column(nullable=true)
+	public String getTelephone() {
+		return telephone;
+	}
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
+	
+	@Column(nullable=false)
+	public boolean isPass() {
+		return isPass;
+	}
+	public void setPass(boolean isPass) {
+		this.isPass = isPass;
+	}
+	
+	@Column(nullable=false,updatable=false)
+	public Integer getDeal() {
+		return deal;
+	}
+	public void setDeal(Integer deal) {
+		this.deal = deal;
+	}
 	
 	@ManyToOne(optional=false)
 	public Job getJob() {
@@ -51,19 +95,4 @@ public class NewsStudent extends DateEntity {
 		this.isRead = isRead;
 	}
 	
-	@Column(nullable=false)
-	public boolean isAgent() {
-		return isAgent;
-	}
-	public void setAgent(boolean isAgent) {
-		this.isAgent = isAgent;
-	}
-	
-	@Column(nullable=false)
-	public boolean isJob() {
-		return isJob;
-	}
-	public void setJob(boolean isJob) {
-		this.isJob = isJob;
-	}
 }

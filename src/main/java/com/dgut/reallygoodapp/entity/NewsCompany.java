@@ -17,10 +17,26 @@ public class NewsCompany extends DateEntity {
 	Resume resume;
 	
 	boolean isRead;
-	boolean isAgent;
-	boolean isJob;
+	Integer deal;
+	boolean isdeal;
 	
-	@ManyToOne(optional=false)
+	@Column(nullable=false)
+	public boolean isIsdeal() {
+		return isdeal;
+	}
+	public void setIsdeal(boolean isdeal) {
+		this.isdeal = isdeal;
+	}
+	
+	@Column(nullable=false,updatable=false)
+	public Integer getDeal() {
+		return deal;
+	}
+	public void setDeal(Integer deal) {
+		this.deal = deal;
+	}
+	
+	@ManyToOne(optional=true)
 	public Job getJob() {
 		return job;
 	}
@@ -28,7 +44,7 @@ public class NewsCompany extends DateEntity {
 		this.job = job;
 	}
 	
-	@ManyToOne(optional=false)
+	@ManyToOne(optional=true)
 	public Resume getResume() {
 		return resume;
 	}
@@ -58,22 +74,6 @@ public class NewsCompany extends DateEntity {
 	}
 	public void setRead(boolean isRead) {
 		this.isRead = isRead;
-	}
-	
-	@Column(nullable=false,updatable=false)
-	public boolean isAgent() {
-		return isAgent;
-	}
-	public void setAgent(boolean isAgent) {
-		this.isAgent = isAgent;
-	}
-	
-	@Column(nullable=false,updatable=false)
-	public boolean isJob() {
-		return isJob;
-	}
-	public void setJob(boolean isJob) {
-		this.isJob = isJob;
 	}
 	
 }
