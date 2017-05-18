@@ -1,10 +1,13 @@
 package com.dgut.reallygoodapp.controller;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.dgut.reallygoodapp.entity.Article;
+import com.dgut.reallygoodapp.entity.CommentCompany;
 import com.dgut.reallygoodapp.entity.CompanyUser;
 import com.dgut.reallygoodapp.entity.Experience;
 import com.dgut.reallygoodapp.entity.Honor;
@@ -26,6 +31,7 @@ import com.dgut.reallygoodapp.entity.Resume;
 import com.dgut.reallygoodapp.entity.StudentUser;
 import com.dgut.reallygoodapp.entity.Talk;
 import com.dgut.reallygoodapp.service.IArticleService;
+import com.dgut.reallygoodapp.service.ICommentCompanyService;
 import com.dgut.reallygoodapp.service.ICompanyUserService;
 import com.dgut.reallygoodapp.service.IExperienceService;
 import com.dgut.reallygoodapp.service.IHonorService;
@@ -78,6 +84,9 @@ public class APIController {
 	
 	@Autowired
 	INewsStudentService NewsStudentService;
+	
+	@Autowired
+	ICommentCompanyService CommentCompanyService;
 
 	@RequestMapping(value = "/hello", method = RequestMethod.GET)
 	public @ResponseBody String hello() {
@@ -239,6 +248,9 @@ public class APIController {
 		job.setWorkAddress(workAddress);
 		
 		job.setCompanyUser(companyUser);
+		
+		List<StudentUser> agentList =new ArrayList<>();
+		job.setAgentList(agentList);
 		
 		return JobService.save(job);
 		
@@ -576,6 +588,16 @@ public class APIController {
 		return NewsCompanyService.findByCompanyUser(companyUser);
 	}
 	
+	//获得学生消息
+	@RequestMapping(value = "/getstudentnews", method = RequestMethod.GET)
+	@ResponseBody
+	public List<NewsStudent> getStudentNews(HttpServletRequest request) {
+
+		StudentUser studentUser = checkLoginStudent(request);
+
+		return NewsStudentService.findByStudentUser(studentUser);
+	}
+	
 	//通过ID获得companyNews
 	@RequestMapping(value = "/getcompanynewsbyid/{newsId}",method=RequestMethod.GET)
 	@ResponseBody
@@ -586,6 +608,18 @@ public class APIController {
 		return NewsCompanyService.findById(newsId);
 		
 	}
+	
+	//通过ID获得companyNews
+	@RequestMapping(value = "/getstudentnewsbyid/{newsId}", method = RequestMethod.GET)
+	@ResponseBody
+	public NewsStudent getStudentNewsById(
+			@PathVariable int newsId,
+			HttpServletRequest request) {
+
+		return NewsStudentService.findById(newsId);
+
+	}
+	
 	
 	//通过ID获得工作经验
 	@RequestMapping(value="/getexperiencebyresumeid/{resumeid}",method=RequestMethod.GET)
@@ -651,38 +685,182 @@ public class APIController {
 	}
 	
 	//投递简历处理
-		@RequestMapping(value="/jobapplypass",method=RequestMethod.POST)
-		@ResponseBody
-		public NewsStudent jobApplyPass(
-				@RequestParam String studentUserId,
-				@RequestParam String jobId,
-				@RequestParam String newscompanyId,
-				@RequestParam String meettime,
-				@RequestParam String meetaddress,
-				@RequestParam String telephone,
-				HttpServletRequest request){
-			
-			StudentUser studentUser = StudentUserService.findById(Integer.valueOf(studentUserId));
-			
-			Job job = JobService.findById(Integer.valueOf(jobId));
-			
-			NewsStudent newsStudent = new NewsStudent();
-			
-			newsStudent.setStudentUser(studentUser);
-			newsStudent.setJob(job);
-			newsStudent.setRead(false);
-			newsStudent.setDeal(NEWS_DEAL_JOB);
-			newsStudent.setPass(false);
-			newsStudent.setNewsText("你对——" + job.getJobName() + "——投递的简历已被录用");
-			newsStudent.setMeetTime(meettime);
-			newsStudent.setMeetAddress(meetaddress);
-			newsStudent.setTelephone(telephone);
-			
-			NewsCompany newsCompany = NewsCompanyService.findById(Integer.valueOf(newscompanyId));
-			newsCompany.setIsdeal(true);
-			
-			NewsCompanyService.save(newsCompany);
-			
-			return NewsStudentService.save(newsStudent);
+	@RequestMapping(value = "/jobapplypass", method = RequestMethod.POST)
+	@ResponseBody
+	public NewsStudent jobApplyPass(
+			@RequestParam String studentUserId,
+			@RequestParam String jobId,
+			@RequestParam String newscompanyId,
+			@RequestParam String meettime,
+			@RequestParam String meetaddress,
+			@RequestParam String telephone,
+			HttpServletRequest request) {
+
+		StudentUser studentUser = StudentUserService.findById(Integer.valueOf(studentUserId));
+
+		Job job = JobService.findById(Integer.valueOf(jobId));
+
+		NewsStudent newsStudent = new NewsStudent();
+
+		newsStudent.setStudentUser(studentUser);
+		newsStudent.setJob(job);
+		newsStudent.setRead(false);
+		newsStudent.setDeal(NEWS_DEAL_JOB);
+		newsStudent.setPass(false);
+		newsStudent.setNewsText("你对——" + job.getJobName() + "——投递的简历已被录用");
+		newsStudent.setMeetTime(meettime);
+		newsStudent.setMeetAddress(meetaddress);
+		newsStudent.setTelephone(telephone);
+
+		NewsCompany newsCompany = NewsCompanyService.findById(Integer.valueOf(newscompanyId));
+		newsCompany.setIsdeal(true);
+
+		NewsCompanyService.save(newsCompany);
+
+		return NewsStudentService.save(newsStudent);
+	}
+		
+	//申请代理处理
+	@RequestMapping(value = "/agentapplyunpass", method = RequestMethod.POST)
+	@ResponseBody
+	public NewsStudent agentApplyUnPass(
+			@RequestParam String studentUserId,
+			@RequestParam String jobId,
+			@RequestParam String newscompanyId,
+			HttpServletRequest request) {
+
+		StudentUser studentUser = StudentUserService.findById(Integer.valueOf(studentUserId));
+
+		Job job = JobService.findById(Integer.valueOf(jobId));
+
+		NewsStudent newsStudent = new NewsStudent();
+
+		newsStudent.setStudentUser(studentUser);
+		newsStudent.setJob(job);
+		newsStudent.setRead(false);
+		newsStudent.setDeal(NEWS_DEAL_AGENT);
+		newsStudent.setPass(false);
+		newsStudent.setNewsText("你对——" + job.getJobName() + "——申请的代理已被浏览");
+		newsStudent.setMeetTime(null);
+		newsStudent.setMeetAddress(null);
+		newsStudent.setTelephone(null);
+
+		NewsCompany newsCompany = NewsCompanyService.findById(Integer.valueOf(newscompanyId));
+		newsCompany.setIsdeal(true);
+
+		NewsCompanyService.save(newsCompany);
+
+		return NewsStudentService.save(newsStudent);
+	}
+	
+	//申请代理处理
+	@RequestMapping(value = "/agentapplypass", method = RequestMethod.POST)
+	@ResponseBody
+	public NewsStudent agentApplyPass(
+			@RequestParam String studentUserId,
+			@RequestParam String jobId,
+			@RequestParam String newscompanyId,
+			HttpServletRequest request) {
+
+		StudentUser studentUser = StudentUserService.findById(Integer.valueOf(studentUserId));
+
+		Job job = JobService.findById(Integer.valueOf(jobId));
+		
+		List<StudentUser> agentList = job.getAgentList();
+		if (agentList == null) {
+			agentList = new ArrayList<>();
 		}
+		agentList.add(studentUser);
+		job.setAgentList(agentList);
+		JobService.save(job);
+
+		NewsStudent newsStudent = new NewsStudent();
+
+		newsStudent.setStudentUser(studentUser);
+		newsStudent.setJob(job);
+		newsStudent.setRead(false);
+		newsStudent.setDeal(NEWS_DEAL_AGENT);
+		newsStudent.setPass(true);
+		newsStudent.setNewsText("你对——" + job.getJobName() + "——申请的代理已被允许");
+		newsStudent.setMeetTime(null);
+		newsStudent.setMeetAddress(null);
+		newsStudent.setTelephone(null);
+
+		NewsCompany newsCompany = NewsCompanyService.findById(Integer.valueOf(newscompanyId));
+		newsCompany.setIsdeal(true);
+
+		NewsCompanyService.save(newsCompany);
+
+		return NewsStudentService.save(newsStudent);
+	}
+		
+	//添加评价
+	@RequestMapping(value = "/addcommentcompany",method=RequestMethod.POST)
+	@ResponseBody
+	public CommentCompany addCommnetCompany(
+			@RequestParam String companyuserId,
+			@RequestParam String score,
+			@RequestParam String comment,
+			HttpServletRequest request){
+		
+		CompanyUser companyUser = CompanyUserService.findById(Integer.valueOf(companyuserId));
+		
+		CommentCompany commentCompany = new CommentCompany();
+		
+		commentCompany.setCompanyUser(companyUser);
+		commentCompany.setScore(score);
+		commentCompany.setComment(comment);
+		
+		return CommentCompanyService.save(commentCompany);
+		
+	}
+	
+	//保存头像
+	@RequestMapping(value ="/saveavatarcompany",method = RequestMethod.POST)
+	@ResponseBody
+	public String saveAvatarCompany(
+			MultipartFile avatar,
+			HttpServletRequest request){
+		
+		CompanyUser companyUser = checkLoginCompany(request);
+		
+
+		if (avatar != null && companyUser != null) {
+			try {
+
+				String realPath = request.getSession().getServletContext().getRealPath("/WEB-INF/upload");
+				FileUtils.copyInputStreamToFile(avatar.getInputStream(), new File(realPath, "comapny" + companyUser.getAccount() + ".png"));
+				companyUser.setAvatar("upload/"+ "comapny" + companyUser.getAccount() + ".png");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return "保存成功";
+		}
+		
+		return "保存失败";
+	}
+	
+	//保存头像
+	@RequestMapping(value = "/saveavatarstudent", method = RequestMethod.POST)
+	@ResponseBody
+	public String saveAvatarStudent(
+			MultipartFile avatar,
+			HttpServletRequest request) {
+
+		StudentUser studentUser = checkLoginStudent(request);
+
+		if (avatar != null && studentUser != null) {
+			try {
+
+				String realPath = request.getSession().getServletContext().getRealPath("/WEB-INF/upload");
+				FileUtils.copyInputStreamToFile(avatar.getInputStream(),new File(realPath, "student" + studentUser.getAccount() + ".png"));
+				studentUser.setAvatar("upload/" + "student" + studentUser.getAccount() + ".png");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return "保存成功";
+		}
+
+		return "保存失败";
+	}
 }

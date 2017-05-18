@@ -12,8 +12,11 @@ public class CompanyUser extends UserEntity{
 	String city;
 	String town;
 	String companyName;
+	
 	String log;
 	String avatar;
+	
+	
 	String companyType;
 	String companyNumber;
 	String companyIndustry;

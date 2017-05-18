@@ -1,5 +1,7 @@
 package com.dgut.reallygoodapp.entity;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -25,6 +27,16 @@ public class Job extends DateEntity {
 	String workTown;			//工作城镇
 	String workAddress;			//详细地址
 	
+	List<StudentUser> agentList;	//代理人列表
+	
+	
+	@Column(nullable=true)
+	public List<StudentUser> getAgentList() {
+		return agentList;
+	}
+	public void setAgentList(List<StudentUser> agentList) {
+		this.agentList = agentList;
+	}
 	
 	@ManyToOne(optional=false)
 	public CompanyUser getCompanyUser() {
